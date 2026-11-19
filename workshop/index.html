@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>صنوبر · استبيان الورشة</title>
+<meta name="description" content="ستة أجزاء قصيرة لنفهم كيف تسير ورشتك، لنبني لك ما يساعدك فعلًا.">
+<meta name="theme-color" content="#3e2a20">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Snouber's light theme (src/app/globals.css :root): Wengé, walnut, white melamine. */
+  :root {
+    --background: #f7f1e6;
+    --foreground: #3e2a20;
+    --card: #fffcf6;
+    --primary: #3e2a20;
+    --primary-foreground: #f7f1e6;
+    --muted: #f0e8db;
+    --muted-foreground: #6b5d52;
+    --accent: #f1e3cc;
+    --border: #e6dccb;
+    --input: #dccfbb;
+    --wood: #8a5a36;
+    --destructive: oklch(0.55 0.2 27);
+    --snouber-tree: #d2a86e;
+    --snouber-edge: #b07f45;
+    --snouber-trunk: #8a5a36;
+    --snouber-eye: #3e2a20;
+    --whatsapp: #1f8f4e;
+    --radius: 0.625rem;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    min-height: 100dvh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 16px 16px 32px; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 4px 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 20px; color: var(--primary); }
+  .brand svg { width: 30px; height: 30px; }
+  .count { font-size: 14px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; text-align: end; }
+
+  .bar { height: 6px; border-radius: 99px; background: var(--muted); overflow: hidden; margin-bottom: 20px; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--wood); border-radius: 99px; transition: width 300ms ease; }
+
+  main { flex: 1; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.8); padding: 22px 18px; }
+  .step { animation: enter 260ms ease both; }
+  @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .snouber { display: block; width: 92px; height: 92px; margin: 4px auto 12px; }
+  h1 { font-size: 24px; line-height: 1.4; margin: 0 0 10px; text-align: center; }
+  h2 { font-size: 21px; line-height: 1.45; margin: 0 0 6px; }
+  .lead { color: var(--muted-foreground); margin: 0 0 8px; text-align: center; }
+  .hint { color: var(--muted-foreground); font-size: 14px; margin: 0 0 14px; }
+  .tag { display: inline-block; font-size: 13px; color: var(--wood); font-weight: 600; margin-bottom: 6px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .opt {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    font: inherit; color: inherit; text-align: start;
+    background: var(--background); border: 1.5px solid var(--input); border-radius: var(--radius);
+    padding: 12px 14px; min-height: 52px; cursor: pointer;
+    transition: border-color 150ms, background 150ms;
+  }
+  .opt .box { flex: none; width: 22px; height: 22px; border: 2px solid var(--input); display: grid; place-items: center; background: var(--card); }
+  .opt[data-kind="multi"] .box { border-radius: 6px; }
+  .opt[data-kind="single"] .box { border-radius: 50%; }
+  .opt[aria-checked="true"] { border-color: var(--primary); background: var(--accent); }
+  .opt[aria-checked="true"] .box { border-color: var(--primary); background: var(--primary); }
+  .opt[aria-checked="true"] .box::after { content: ""; width: 10px; height: 10px; border-radius: inherit; background: var(--primary-foreground); }
+  .opt[data-kind="multi"][aria-checked="true"] .box::after { width: 6px; height: 11px; border-radius: 0; background: none; border: solid var(--primary-foreground); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+  .opt:focus-visible, textarea:focus-visible, input:focus-visible, .btn:focus-visible { outline: 3px solid var(--wood); outline-offset: 2px; }
+
+  label.follow { display: block; font-weight: 600; margin: 18px 0 6px; }
+  textarea, input[type="text"] {
+    width: 100%; font: inherit; color: inherit; background: var(--background);
+    border: 1.5px solid var(--input); border-radius: var(--radius); padding: 12px 14px;
+  }
+  textarea { min-height: 120px; resize: vertical; }
+  .other-input { margin-top: 10px; }
+  .error { color: var(--destructive); font-size: 15px; margin: 12px 0 0; min-height: 1.6em; }
+
+  .rec { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .rec-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+    min-height: 58px; padding: 12px 16px; cursor: pointer; text-decoration: none;
+    font: inherit; font-weight: 600; font-size: 18px;
+    color: var(--primary-foreground); background: var(--wood); border: 0; border-radius: var(--radius);
+  }
+  .rec-btn svg { width: 24px; height: 24px; flex: none; }
+  .rec-btn.on { background: var(--primary); }
+  .rec-btn.ghost { min-height: 48px; font-size: 16px; color: var(--wood); background: transparent; border: 1.5px solid var(--wood); }
+  .rec-btn .dot { width: 12px; height: 12px; border-radius: 50%; background: #e0574a; animation: pulse 1s ease-in-out infinite; }
+  .rec-btn .time { font-variant-numeric: tabular-nums; opacity: 0.85; }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  .rec audio { width: 100%; }
+  .rec-ok { margin: 0; color: var(--wood); font-weight: 600; font-size: 15px; }
+  .rec-ok:empty { display: none; }
+  .rec-note { margin: 0; font-size: 14px; color: var(--muted-foreground); text-align: center; }
+  .rec-err { margin: 0; font-size: 15px; color: var(--destructive); }
+  .or { text-align: center; font-size: 13px; color: var(--muted-foreground); margin: 10px 0 6px; }
+  .lead.sent { color: var(--wood); font-weight: 600; }
+
+  nav { display: flex; gap: 10px; margin-top: 18px; }
+  .btn {
+    font: inherit; font-weight: 600; border: 0; border-radius: var(--radius);
+    padding: 14px 18px; min-height: 54px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+  }
+  .btn.primary { flex: 1; background: var(--primary); color: var(--primary-foreground); }
+  .btn.ghost { background: transparent; color: var(--muted-foreground); border: 1.5px solid var(--border); }
+  .btn.wa { width: 100%; background: var(--whatsapp); color: #fff; font-size: 18px; margin-top: 16px; }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+
+  .parts { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .parts button {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+    font: inherit; color: inherit; text-align: start; cursor: pointer;
+    background: var(--background); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 11px 14px;
+  }
+  .parts .state { font-size: 14px; color: var(--muted-foreground); white-space: nowrap; }
+  .parts .state.sent { color: var(--wood); font-weight: 600; }
+
+  .after { margin-top: 18px; padding: 14px; border-radius: var(--radius); background: var(--muted); }
+  .after p { margin: 0 0 8px; }
+  .after p:last-child { margin: 0; }
+  .after strong { color: var(--primary); }
+  footer { text-align: center; font-size: 13px; color: var(--muted-foreground); margin-top: 22px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step { animation: none; }
+    .bar > i, .opt { transition: none; }
+    .rec-btn .dot { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand"><span id="brand-mark"></span>صنوبر</span>
+    <span class="count" id="count" aria-live="polite"></span>
+  </header>
+  <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+  <main id="app"></main>
+  <footer>إجاباتك وتسجيلاتك تصل إلى فريق صنوبر وحده، أولًا بأول. لا نعرضها على أحد، ونحذفها بعد أن نقرأها ونسمعها.</footer>
+</div>
+
+<script>
+(function () {
+  // Answers, voice notes and photos go to save.php (next to this page), little by little, as he answers.
+  // WhatsApp (Snouber's business number, 0563133068) is only the way out when that fails or the phone cannot record.
+  var WHATSAPP = "213563133068";
+  var STORE = "snouber-workshop-survey-v4";
+
+  // The questions that decide the MVP (docs/product/workshops.md, section 8; the hypothesis number in "h").
+  // kind: "single" (one choice), "multi" (several), "text". "follow": an optional line under the choices.
+  // "voice": record the answer in the page. "photo": add photos. "showIf": asked only when
+  // the answer to another question is not one of the listed choices.
+  var PARTS = [
+    { title: "الورشة", minutes: 1, questions: [
+      { id: "makes", kind: "multi", title: "ماذا تصنع أكثر؟", hint: "اختر كل ما ينطبق.",
+        options: ["مطابخ", "دريسينغ", "غرف نوم", "أبواب", "أثاث مكاتب أو محلات"], other: "شيء آخر" },
+      { id: "partner", kind: "single", title: "هل لك شريك في الورشة؟", h: 12,
+        options: ["لا", "شريك واحد", "أكثر من شريك"] }
+    ]},
+    { title: "عرض السعر والدفع", minutes: 3, questions: [
+      { id: "price_by", kind: "multi", title: "كيف تحسب السعر في عرض السعر (الدوفي)؟", hint: "اختر كل ما ينطبق.",
+        options: ["بالمتر الطولي", "بالمتر المربع", "قطعة قطعة (خزانة، باب، درج…)", "مبلغ واحد للمشروع كله"], other: "طريقة أخرى" },
+      { id: "devis_how", kind: "single", title: "كيف تكتب عرض السعر اليوم؟", h: 1, photo: true,
+        hint: "إن كانت عندك صورة عرض سعر قديم، أضفها هنا دون اسم الزبون. تساعدنا كثيرًا.",
+        options: ["باليد على ورقة", "في Word أو Excel", "في تطبيق في الهاتف", "لا أكتبه، نتفق بالكلام"], other: "طريقة أخرى" },
+      { id: "pay_how", kind: "multi", title: "كيف يدفع لك الزبون عادة؟", h: 3, hint: "اختر كل ما ينطبق.",
+        options: ["عربون، ثم الباقي عند التسليم", "عربون، ثم الباقي على دفعات", "كل المبلغ مرة واحدة"], other: "طريقة أخرى" },
+      { id: "forgot_payment", kind: "single", title: "هل نسيت مرة دفعة، أو اختلفت مع زبون على ما دفعه؟", h: 4,
+        options: ["نعم، هذه السنة", "نعم، من قبل", "لا، أبدًا"],
+        follow: "ماذا حدث؟", voice: true }
+    ]},
+    { title: "الربح والتسليم", minutes: 3, questions: [
+      { id: "costs", kind: "multi", title: "ما المصاريف التي تدخل في مشروع واحد؟", h: 2, hint: "اختر كل ما ينطبق.",
+        options: ["الألواح", "الإكسسوار (مفصلات، مقابض، سكك…)", "التقطيع والحواف", "أجرة العمال", "النقل", "التركيب عند الزبون"], other: "شيء آخر" },
+      { id: "profit_know", kind: "single", title: "في آخر مشروع سلّمته، هل تعرف كم ربحت؟", h: 2,
+        options: ["نعم، بالضبط", "تقريبًا", "لا أعرف"],
+        follow: "كيف حسبته؟", voice: true },
+      { id: "late_count", kind: "single", title: "هذه السنة، كم مشروعًا تأخر عن موعد التسليم؟", h: 5,
+        options: ["لا شيء", "1 أو 2", "من 3 إلى 5", "أكثر من 5", "لا أعرف"] },
+      { id: "changed", kind: "single", title: "حين يغيّر الزبون شيئًا بعد عرض السعر (لون، مقاس، إضافة)، ماذا تفعل؟", h: 6,
+        options: ["نادرًا ما يغيّر", "أزيد في السعر وأكتبه", "أزيد في السعر بالكلام فقط", "أتحمّل الفرق أنا"], other: "شيء آخر" }
+    ]},
+    { title: "التصميم والتكلفة والأسعار", minutes: 4, questions: [
+      { id: "biggest", kind: "multi", required: true,
+        title: "من هذه الأمور، ما الذي يأخذ منك وقتًا أو مالًا أكثر؟",
+        hint: "اختر ثلاثة على الأكثر: الأكبر فقط.", max: 3,
+        options: ["أن أُري الزبون شكل ما سأصنعه قبل البدء", "حساب التكلفة وكتابة عرض السعر",
+          "معرفة أسعار الألواح والإكسسوار اليوم", "حساب الألواح اللازمة والتقطيع (الضياع)", "أخطاء القياس",
+          "إيجاد زبائن جدد", "العمال (إيجادهم، غيابهم، مستواهم)", "متابعة المال: من دفع ومن بقي عليه",
+          "التأخر في التسليم"], other: "شيء آخر" },
+      { id: "show_design", kind: "multi", title: "كيف تُري الزبون ما ستصنعه له قبل أن تبدأ؟", hint: "اختر كل ما ينطبق.",
+        options: ["رسم باليد", "صور أعمال سابقة لي", "صور من الإنترنت أو إنستغرام",
+          "برنامج تصميم بالأبعاد الثلاثة", "يأتي إلى الورشة ويرى", "لا شيء، نتفق بالكلام"], other: "طريقة أخرى",
+        follow: "هل خسرت زبونًا، أو أعدت عملًا، لأن الزبون تخيّل شيئًا آخر؟ احكِ لنا.", voice: true },
+      { id: "cost_calc", kind: "single", title: "حين تكتب عرض السعر، كيف تعرف كم ستكلفك الألواح والإكسسوار؟",
+        options: ["أحسب عدد الألواح بنفسي على ورقة", "أرسل المقاسات للتاجر فيحسبها", "ببرنامج تقطيع",
+          "بالخبرة، تقريبًا"], other: "طريقة أخرى",
+        follow: "كم يأخذ منك هذا الحساب؟ وهل أخطأت فيه مرة؟", voice: true },
+      { id: "prices_know", kind: "multi", title: "كيف تعرف أسعار الألواح والإكسسوار اليوم؟", h: 7, hint: "اختر كل ما ينطبق.",
+        options: ["أتصل بالتاجر", "أذهب إلى المحل", "مجموعات فيسبوك أو واتساب", "من آخر شراء لي",
+          "لا أعرفها حتى أشتري"], other: "طريقة أخرى" },
+      { id: "prices_change", kind: "single", title: "كم مرة تتغير أسعار الألواح والإكسسوار؟", h: 7,
+        options: ["كل أسبوع تقريبًا", "كل شهر تقريبًا", "بضع مرات في السنة", "نادرًا"],
+        follow: "ماذا تفعل حين يرتفع السعر بعد أن أعطيت الزبون عرض السعر؟", voice: true }
+    ]},
+    { title: "الختام", minutes: 4, questions: [
+      { id: "tools", kind: "multi", title: "ماذا تستعمل اليوم لحسابات الورشة؟", photo: true,
+        hint: "اختر كل ما ينطبق. وإن كان عندك دفتر، صوّر صفحة منه دون أسماء وأضفها هنا.",
+        options: ["دفتر", "أوراق متفرقة", "Word أو Excel", "تطبيق في الهاتف", "لا شيء"], other: "شيء آخر" },
+      { id: "most_tiring", kind: "text", voice: true, required: true,
+        title: "ما أكثر شيء يتعبك في الأسبوع، غير العمل بيدك؟" },
+      { id: "story", kind: "text", voice: true,
+        title: "احكِ لنا قصة آخر مشروع سلّمته، من أول اتصال إلى آخر دفعة. ما الذي أتعبك فيه؟",
+        hint: "اختياري، لكنه يساعدنا كثيرًا. الأسهل أن تسجّلها بصوتك." },
+      { id: "missed", kind: "text", voice: true,
+        title: "ما المشكلة الكبيرة عند أصحاب الورشات التي لم نسألك عنها؟",
+        hint: "أنت تعرف هذا العمل أكثر منا. قل لنا ما فاتنا." }
+    ]}
+  ];
+
+  // Flatten: one screen per question, numbered across the whole survey.
+  var ALL = [];
+  PARTS.forEach(function (p, pi) {
+    p.questions.forEach(function (q) { q.part = pi; q.n = ALL.length + 1; ALL.push(q); });
+  });
+  var TOTAL = ALL.length;
+
+  var app = document.getElementById("app");
+  var bar = document.getElementById("bar");
+  var count = document.getElementById("count");
+
+  // Screens: {type:"welcome"} | {type:"q", i} | {type:"end"}
+  var state = load() || { screen: { type: "welcome" }, answers: {}, started: false };
+  if (!state.sid) state.sid = newId();
+
+  function newId() {
+    var b = new Uint8Array(16);
+    crypto.getRandomValues(b);
+    return Array.prototype.map.call(b, function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+  }
+  function load() {
+    try { var s = JSON.parse(localStorage.getItem(STORE)); return s && s.answers && s.screen ? s : null; } catch (e) { return null; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* private mode: answers stay in memory */ }
+  }
+  // Something he typed or picked: kept on the phone now, sent with the next sync.
+  function changed() { state.dirty = true; save(); }
+  function answer(id) {
+    if (!state.answers[id]) state.answers[id] = { picked: [], other: "", text: "", voice: false, photos: 0 };
+    return state.answers[id];
+  }
+  function el(tag, attrs, children) {
+    var n = document.createElement(tag);
+    for (var k in attrs || {}) {
+      if (k === "text") n.textContent = attrs[k];
+      else if (k === "html") n.innerHTML = attrs[k];
+      else if (k.slice(0, 2) === "on") n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach(function (c) { if (c) n.appendChild(c); });
+    return n;
+  }
+
+  // ---- Files (voice notes, photos): kept on the phone in IndexedDB until they reach us. ----
+  // Keys: "voice|<question id>" (one per question, a new recording replaces it) and "photo|<question id>|<stamp>".
+  var MEM = {};
+  var DBP = null;
+  function db() {
+    if (!DBP) DBP = new Promise(function (res, rej) {
+      if (!window.indexedDB) return rej(new Error("no indexedDB"));
+      var r = indexedDB.open("snouber-workshop-files", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("files"); };
+      r.onsuccess = function () { res(r.result); };
+      r.onerror = function () { rej(r.error); };
+    });
+    return DBP;
+  }
+  function idb(mode, fn) {
+    return db().then(function (d) {
+      return new Promise(function (res, rej) {
+        var tx = d.transaction("files", mode);
+        var req = fn(tx.objectStore("files"));
+        tx.oncomplete = function () { res(req ? req.result : undefined); };
+        tx.onerror = function () { rej(tx.error); };
+      });
+    });
+  }
+  function putFile(key, rec) {
+    MEM[key] = rec;
+    return idb("readwrite", function (s) { s.put(rec, key); }).catch(function () { /* memory copy only */ });
+  }
+  function getFile(key) {
+    if (MEM[key]) return Promise.resolve(MEM[key]);
+    return idb("readonly", function (s) { return s.get(key); }).catch(function () { return undefined; });
+  }
+  function fileKeys() {
+    return idb("readonly", function (s) { return s.getAllKeys(); }).catch(function () { return []; }).then(function (keys) {
+      keys = (keys || []).slice();
+      Object.keys(MEM).forEach(function (k) { if (keys.indexOf(k) < 0) keys.push(k); });
+      return keys;
+    });
+  }
+
+  // ---- Sending: everything goes to save.php next to this page, little by little, in the background. ----
+  var RECEIVER = "save.php";
+  var syncing = false, syncAgain = false, lastSync = null;
+
+  function post(fd) {
+    return fetch(RECEIVER, { method: "POST", body: fd }).then(function (r) {
+      return r.json().catch(function () { return { ok: false }; }).then(function (j) {
+        if (!r.ok || !j.ok) throw new Error((j && j.error) || "http " + r.status);
+        return j;
+      });
+    });
+  }
+  function sendAnswers() {
+    state.dirty = false; save();
+    var fd = new FormData();
+    fd.append("sid", state.sid);
+    fd.append("kind", "answers");
+    fd.append("answers", JSON.stringify(report()));
+    return post(fd).catch(function (e) { state.dirty = true; save(); throw e; });
+  }
+  function ext(type) {
+    if (/webm/.test(type)) return "webm";
+    if (/ogg/.test(type)) return "ogg";
+    if (/mp4|m4a|aac/.test(type)) return "m4a";
+    if (/png/.test(type)) return "png";
+    if (/webp/.test(type)) return "webp";
+    if (/hei[cf]/.test(type)) return "heic";
+    return "jpg";
+  }
+  function sendFiles() {
+    var failed = 0;
+    return fileKeys().then(function (keys) {
+      return keys.reduce(function (p, key) {
+        return p.then(function () {
+          return getFile(key).then(function (rec) {
+            if (!rec || rec.uploaded) return;
+            var parts = key.split("|");
+            var fd = new FormData();
+            fd.append("sid", state.sid);
+            fd.append("kind", parts[0]);
+            fd.append("q", parts[1]);
+            fd.append("file", rec.blob, parts[1] + "." + ext(rec.type || ""));
+            return post(fd).then(function () {
+              rec.uploaded = true;
+              return putFile(key, rec);
+            }, function () { failed++; });
+          });
+        });
+      }, Promise.resolve());
+    }).then(function () { if (failed) throw new Error(failed + " files"); });
+  }
+  function sync() {
+    if (syncing) { syncAgain = true; return; }
+    syncing = true;
+    if (state.screen.type === "end") render();
+    var p = state.dirty ? sendAnswers() : Promise.resolve();
+    p.then(sendFiles).then(function () { lastSync = "ok"; }, function () { lastSync = "failed"; }).then(function () {
+      syncing = false;
+      if (syncAgain) { syncAgain = false; return sync(); }
+      if (state.screen.type === "end") render();
+      else document.dispatchEvent(new Event("synced"));
+    });
+  }
+  window.addEventListener("online", sync);
+
+  function shown(q) {
+    if (!q.showIf) return true;
+    var a = state.answers[q.showIf.id];
+    if (!a || !a.picked.length) return true;
+    return !a.picked.some(function (p) { return q.showIf.not.indexOf(p) >= 0; });
+  }
+  function hasAnswer(q, a) {
+    if (!a) return false;
+    if (a.voice || a.photos || a.text.trim()) return true;
+    if (q.other && a.picked.length === 1 && a.picked[0] === q.other) return a.other.trim().length > 0;
+    return a.picked.length > 0;
+  }
+  function answeredCount() {
+    return ALL.filter(function (q) { return shown(q) && hasAnswer(q, state.answers[q.id]); }).length;
+  }
+
+  // What reaches us: every question with its answer, and the same as plain text to read.
+  function report() {
+    return {
+      survey: "workshop-v1",
+      sid: state.sid,
+      updated: new Date().toISOString(),
+      finished: !!state.finished,
+      answers: ALL.map(function (q) {
+        var a = state.answers[q.id] || {};
+        return { n: q.n, part: PARTS[q.part].title, id: q.id, title: q.title, asked: shown(q),
+          picked: a.picked || [], other: a.other || "", text: a.text || "", voice: !!a.voice, photos: a.photos || 0 };
+      }),
+      readable: readable()
+    };
+  }
+  function readable() {
+    var lines = ["استبيان الورشة" + (state.finished ? " (أنهاه)" : " (لم ينهه بعد)"), ""];
+    PARTS.forEach(function (p, pi) {
+      lines.push("=== الجزء " + (pi + 1) + ": " + p.title + " ===", "");
+      p.questions.forEach(function (q) {
+        if (!shown(q)) return;
+        var a = state.answers[q.id] || { picked: [], other: "", text: "" };
+        var out = [];
+        if (q.kind !== "text") {
+          var picked = (a.picked || []).map(function (x) { return x === q.other && (a.other || "").trim() ? q.other + ": " + a.other.trim() : x; });
+          if (picked.length) out.push(picked.join("، "));
+          if (q.follow && (a.text || "").trim()) out.push(q.follow + " " + a.text.trim());
+        } else if ((a.text || "").trim()) {
+          out.push(a.text.trim());
+        }
+        if (a.voice) out.push("[تسجيل صوتي: voice-" + q.id + "]");
+        if (a.photos) out.push("[صور: " + a.photos + "]");
+        lines.push(q.n + ". " + q.title);
+        lines.push(out.length ? out.join("\n") : "(بلا جواب)");
+        lines.push("");
+      });
+    });
+    return lines.join("\n").trim();
+  }
+
+  // The tree is Snouber (src/components/brand/snouber-mark.tsx): Sonoma pine, walnut trunk, Wengé eyes.
+  function snouber(cls, smile) {
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "10 10 200 200");
+    svg.setAttribute("aria-hidden", "true");
+    if (cls) svg.setAttribute("class", cls);
+    var eyes = smile
+      ? '<path d="M85 108 Q94 95 103 108" fill="none" stroke="var(--snouber-eye)" stroke-width="7" stroke-linecap="round"/>' +
+        '<path d="M117 108 Q126 95 135 108" fill="none" stroke="var(--snouber-eye)" stroke-width="7" stroke-linecap="round"/>'
+      : '<ellipse cx="94" cy="104" rx="9" ry="14" fill="var(--snouber-eye)"/><ellipse cx="126" cy="104" rx="9" ry="14" fill="var(--snouber-eye)"/>';
+    svg.innerHTML =
+      '<rect x="99" y="160" width="22" height="38" rx="5" fill="var(--snouber-trunk)"/>' +
+      '<path d="M110 26 L148 78 L130 78 L162 122 L142 122 L176 166 L44 166 L78 122 L58 122 L90 78 L72 78 Z" ' +
+      'fill="var(--snouber-tree)" stroke="var(--snouber-edge)" stroke-width="8" stroke-linejoin="round"/>' + eyes;
+    return svg;
+  }
+  document.getElementById("brand-mark").appendChild(snouber());
+
+  var WA_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>';
+  var MIC_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>';
+  var CAM_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+
+  // ---- Recording in the page (MediaRecorder). One recording at a time. ----
+  var CAN_RECORD = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  var MAX_RECORDING_MS = 10 * 60 * 1000;
+  var REC = null;
+
+  function pickType() {
+    var types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
+    for (var i = 0; i < types.length; i++) {
+      if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(types[i])) return types[i];
+    }
+    return "";
+  }
+  function clock(ms) {
+    var s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2);
+  }
+  function tick() {
+    if (REC && REC.ui) REC.ui.textContent = clock(Date.now() - REC.start);
+  }
+  function stopRec() {
+    if (REC && REC.mr.state !== "inactive") { clearTimeout(REC.max); REC.mr.stop(); }
+  }
+  function startRec(q, a, redraw, fail) {
+    stopRec();
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      var type = pickType();
+      var opts = { audioBitsPerSecond: 32000 };
+      if (type) opts.mimeType = type;
+      var mr;
+      try { mr = new MediaRecorder(stream, opts); } catch (e) { mr = new MediaRecorder(stream); }
+      var chunks = [];
+      REC = { mr: mr, qid: q.id, start: Date.now(), ui: null };
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = function () {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        clearInterval(REC && REC.timer);
+        var took = REC ? Date.now() - REC.start : 0;
+        REC = null;
+        var blob = new Blob(chunks, { type: mr.mimeType || type || "audio/webm" });
+        if (took < 1500 || blob.size < 1000) { redraw("قصير جدًا: اضغط مرة أخرى وتكلّم، ثم اضغط «أوقف»."); return; }
+        putFile("voice|" + q.id, { blob: blob, type: blob.type, ts: Date.now(), uploaded: false }).then(function () {
+          a.voice = true;
+          changed();
+          redraw();
+          sync();
+        });
+      };
+      mr.start(1000);
+      REC.timer = setInterval(tick, 500);
+      REC.max = setTimeout(stopRec, MAX_RECORDING_MS);
+      redraw();
+    }, function () {
+      fail("لم يُفتح الميكروفون. اسمح للصفحة باستعمال الميكروفون (من القفل بجانب الرابط)، ثم اضغط مرة أخرى. أو اكتب جوابك.");
+    });
+  }
+
+  function recorder(q, a, onAnswer) {
+    var box = el("div", { class: "rec" });
+    if (!CAN_RECORD) {
+      // Old phones: the voice note goes through WhatsApp instead.
+      var link = el("a", { class: "rec-btn ghost", href: "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent("🎤 السؤال " + q.n + ": " + q.title), target: "_blank", rel: "noopener" });
+      link.innerHTML = MIC_ICON + "<span>أجب بصوتك على واتساب</span>";
+      link.addEventListener("click", function () { a.voice = true; changed(); if (onAnswer) onAnswer(); });
+      box.appendChild(link);
+      return box;
+    }
+    function draw(message) {
+      box.innerHTML = "";
+      if (REC && REC.qid === q.id) {
+        var stop = el("button", { class: "rec-btn on", type: "button" });
+        stop.innerHTML = '<span class="dot" aria-hidden="true"></span><span>أوقف التسجيل</span><span class="time">0:00</span>';
+        stop.addEventListener("click", stopRec);
+        REC.ui = stop.querySelector(".time");
+        tick();
+        box.appendChild(stop);
+        box.appendChild(el("p", { class: "rec-note", text: "تكلّم براحتك، ثم اضغط «أوقف التسجيل»." }));
+        return;
+      }
+      getFile("voice|" + q.id).then(function (rec) {
+        if (REC && REC.qid === q.id) return;
+        box.innerHTML = "";
+        if (rec) {
+          box.appendChild(el("p", { class: "rec-ok", text: rec.uploaded ? "✓ وصلنا تسجيلك" : "✓ حُفظ تسجيلك، ويُرسل وحده" }));
+          var au = el("audio", { controls: "", preload: "metadata" });
+          au.src = URL.createObjectURL(rec.blob);
+          box.appendChild(au);
+          var again = el("button", { class: "rec-btn ghost", type: "button" });
+          again.innerHTML = MIC_ICON + "<span>أعد التسجيل</span>";
+          again.addEventListener("click", start);
+          box.appendChild(again);
+        } else {
+          var go = el("button", { class: "rec-btn", type: "button" });
+          go.innerHTML = MIC_ICON + "<span>سجّل جوابك بصوتك</span>";
+          go.addEventListener("click", start);
+          box.appendChild(go);
+        }
+        if (message) box.appendChild(el("p", { class: "rec-err", role: "alert", text: message }));
+      });
+    }
+    function start() {
+      startRec(q, a, function (message) { draw(message); if (onAnswer) onAnswer(); }, function (message) { draw(message); });
+    }
+    // Once the recording reached us, "saved" becomes "received".
+    document.addEventListener("synced", function () { if (box.isConnected && !(REC && REC.qid === q.id)) draw(); });
+    draw();
+    return box;
+  }
+
+  function photoPicker(q, a) {
+    var box = el("div", { class: "rec" });
+    var input = el("input", { type: "file", accept: "image/*", multiple: "", hidden: "" });
+    var btn = el("button", { class: "rec-btn ghost", type: "button" });
+    btn.innerHTML = CAM_ICON + "<span>أضف صورة</span>";
+    btn.addEventListener("click", function () { input.click(); });
+    var info = el("p", { class: "rec-ok" });
+    function drawInfo() {
+      fileKeys().then(function (keys) {
+        var mine = keys.filter(function (k) { return k.indexOf("photo|" + q.id + "|") === 0; });
+        return Promise.all(mine.map(getFile));
+      }).then(function (recs) {
+        var n = recs.length;
+        var pending = recs.filter(function (r) { return r && !r.uploaded; }).length;
+        info.textContent = !n ? "" : "✓ " + n + (n === 1 ? " صورة" : " صور") + (pending ? "، تُرسل وحدها" : "، وصلتنا");
+      });
+    }
+    document.addEventListener("synced", function () { if (box.isConnected) drawInfo(); });
+    input.addEventListener("change", function () {
+      var files = Array.prototype.slice.call(input.files || []).filter(function (f) { return /^image\//.test(f.type) && f.size <= 25 * 1024 * 1024; });
+      var stamp = Date.now();
+      Promise.all(files.map(function (f, i) {
+        return putFile("photo|" + q.id + "|" + stamp + "-" + i, { blob: f, type: f.type, ts: stamp, uploaded: false });
+      })).then(function () {
+        a.photos = (a.photos || 0) + files.length;
+        changed();
+        drawInfo();
+        sync();
+      });
+      input.value = "";
+    });
+    box.appendChild(input);
+    box.appendChild(btn);
+    box.appendChild(info);
+    drawInfo();
+    return box;
+  }
+
+  // ---- Screens ----
+  function render() {
+    app.innerHTML = "";
+    var sc = state.screen;
+    bar.style.width = Math.round((answeredCount() / TOTAL) * 100) + "%";
+    if (sc.type === "welcome") { count.textContent = ""; return renderWelcome(); }
+    if (sc.type === "end") { count.textContent = ""; return renderEnd(); }
+    var q = ALL[sc.i];
+    count.textContent = "السؤال " + q.n + " من " + TOTAL;
+    renderQuestion(q);
+  }
+
+  // Arabic counting: 1 دقيقة واحدة, 2 دقيقتان, 3–10 دقائق, 11 and more دقيقة.
+  function minutesText(n) {
+    if (n === 1) return "دقيقة واحدة";
+    if (n === 2) return "دقيقتين";
+    return n + (n <= 10 ? " دقائق" : " دقيقة");
+  }
+
+  function partState(pi) {
+    var qs = PARTS[pi].questions.filter(shown);
+    var done = qs.filter(function (q) { return hasAnswer(q, state.answers[q.id]); }).length;
+    if (!done) return { text: "نحو " + minutesText(PARTS[pi].minutes), cls: "" };
+    if (done === qs.length) return { text: "✓ تم", cls: "sent" };
+    return { text: done + " من " + qs.length, cls: "" };
+  }
+  function firstOfPart(pi) {
+    for (var i = 0; i < ALL.length; i++) if (ALL[i].part === pi && shown(ALL[i])) return i;
+    return 0;
+  }
+
+  function renderWelcome() {
+    var started = state.started;
+    var body = [
+      snouber("snouber"),
+      el("h1", { text: started ? "مرحبًا من جديد!" : "مرحبًا!" }),
+      el("p", { class: "lead", text: "نريد أن نفهم كيف تسير ورشتك، من عرض السعر إلى آخر دفعة، لنبني لك ما يساعدك فعلًا." }),
+      el("p", { class: "lead", text: TOTAL + " سؤالًا في نحو " + minutesText(PARTS.reduce(function (m, p) { return m + p.minutes; }, 0)) + ". أغلبها بضغطة، وما يحتاج كلامًا تسجّله بصوتك هنا في الصفحة." }),
+      el("p", { class: "lead", text: "احكِ كما حدث فعلًا، لا كما يجب أن يكون. لا توجد إجابة خاطئة." })
+    ];
+    var list = el("ol", { class: "parts", "aria-label": "أجزاء الاستبيان" });
+    PARTS.forEach(function (p, pi) {
+      var st = partState(pi);
+      list.appendChild(el("li", {}, [
+        el("button", { type: "button", onclick: function () { state.started = true; go({ type: "q", i: firstOfPart(pi) }); } }, [
+          el("span", { text: (pi + 1) + ". " + p.title }),
+          el("span", { class: "state " + st.cls, text: st.text })
+        ])
+      ]));
+    });
+    body.push(list);
+    body.push(el("p", { class: "hint", style: "margin:12px 0 0;text-align:center", text: "تستطيع أن تتوقف متى شئت، وتكمل لاحقًا من نفس الرابط: لا يضيع شيء." }));
+    app.appendChild(el("section", { class: "card step" }, body));
+    app.appendChild(el("nav", {}, [
+      el("button", { class: "btn primary", type: "button", text: started ? "أكمل من حيث توقفت" : "نبدأ",
+        onclick: function () { state.started = true; go(started && state.last ? state.last : { type: "q", i: 0 }); } })
+    ]));
+  }
+
+  function renderQuestion(q) {
+    var a = answer(q.id);
+    var err = el("p", { class: "error", role: "alert" });
+    var clearErr = function () { err.textContent = ""; };
+    var body = [
+      el("span", { class: "tag", text: "الجزء " + (q.part + 1) + " من " + PARTS.length + ": " + PARTS[q.part].title }),
+      el("h2", { id: "q-title", text: q.n + ". " + q.title }),
+      el("p", { class: "hint", text: q.hint ? q.hint : (q.required ? "هذا السؤال مهم لنا." : "يمكنك التخطي إن لم يكن لديك جواب.") })
+    ];
+
+    if (q.kind === "text") {
+      if (q.voice) {
+        body.push(recorder(q, a, clearErr));
+        body.push(el("p", { class: "or", text: "أو اكتب" }));
+      }
+      var ta = el("textarea", { "aria-labelledby": "q-title", maxlength: "2000", placeholder: "اكتب هنا…" });
+      ta.value = a.text;
+      ta.addEventListener("input", function () { a.text = ta.value; changed(); clearErr(); });
+      body.push(ta);
+    } else {
+      var list = el("div", { class: "options", role: q.kind === "multi" ? "group" : "radiogroup", "aria-labelledby": "q-title" });
+      var labels = q.options.slice();
+      if (q.other) labels.push(q.other);
+      var otherInput = null;
+      labels.forEach(function (label) {
+        var isOther = q.other && label === q.other;
+        var btn = el("button", {
+          class: "opt", type: "button", "data-kind": q.kind,
+          role: q.kind === "multi" ? "checkbox" : "radio",
+          "aria-checked": a.picked.indexOf(label) >= 0 ? "true" : "false"
+        }, [el("span", { class: "box", "aria-hidden": "true" }), el("bdi", { text: label })]);
+        btn.addEventListener("click", function () {
+          var i = a.picked.indexOf(label);
+          if (q.kind === "multi") {
+            if (i >= 0) a.picked.splice(i, 1);
+            else if (q.max && a.picked.length >= q.max) { err.textContent = "اخترت ثلاثة. أزل واحدًا لتختار غيره."; return; }
+            else a.picked.push(label);
+          }
+          else { a.picked = i >= 0 ? [] : [label]; }
+          changed();
+          Array.prototype.forEach.call(list.querySelectorAll(".opt"), function (b, j) {
+            b.setAttribute("aria-checked", a.picked.indexOf(labels[j]) >= 0 ? "true" : "false");
+          });
+          if (otherInput) {
+            otherInput.hidden = a.picked.indexOf(q.other) < 0;
+            if (isOther && !otherInput.hidden) otherInput.focus();
+          }
+          clearErr();
+        });
+        list.appendChild(btn);
+      });
+      body.push(list);
+      if (q.other) {
+        otherInput = el("input", { type: "text", class: "other-input", maxlength: "300", placeholder: "اكتب ما هو…", "aria-label": q.other });
+        otherInput.value = a.other;
+        otherInput.hidden = a.picked.indexOf(q.other) < 0;
+        otherInput.addEventListener("input", function () { a.other = otherInput.value; changed(); });
+        body.push(otherInput);
+      }
+      if (q.follow) {
+        var fid = "f-" + q.id;
+        body.push(el("label", { class: "follow", for: fid, text: q.follow }));
+        if (q.voice) {
+          body.push(recorder(q, a, clearErr));
+          body.push(el("p", { class: "or", text: "أو اكتب" }));
+        }
+        var ft = el("textarea", { id: fid, maxlength: "1500", placeholder: "اختياري", style: "min-height:90px" });
+        ft.value = a.text;
+        ft.addEventListener("input", function () { a.text = ft.value; changed(); });
+        body.push(ft);
+      }
+    }
+    if (q.photo) body.push(photoPicker(q, a));
+    body.push(err);
+    app.appendChild(el("section", { class: "card step" }, body));
+
+    var next = el("button", { class: "btn primary", type: "button", text: state.screen.i === lastShown() ? "انتهيت" : "التالي" });
+    next.addEventListener("click", function () {
+      if (q.required && !hasAnswer(q, a)) {
+        err.textContent = q.kind === "text" ? "سجّل جوابك بصوتك أو اكتبه ولو بكلمات قليلة: هذا السؤال يهمنا." : "اختر جوابًا، فهذا السؤال يهمنا.";
+        return;
+      }
+      go(nextScreen(state.screen.i));
+    });
+    app.appendChild(el("nav", {}, [
+      next,
+      el("button", { class: "btn ghost", type: "button", text: "رجوع", onclick: function () { go(prevScreen(state.screen.i)); } })
+    ]));
+  }
+
+  function lastShown() {
+    for (var j = ALL.length - 1; j >= 0; j--) if (shown(ALL[j])) return j;
+    return 0;
+  }
+  function nextScreen(i) {
+    for (var j = i + 1; j < ALL.length; j++) if (shown(ALL[j])) return { type: "q", i: j };
+    return { type: "end" };
+  }
+  function prevScreen(i) {
+    for (var j = i - 1; j >= 0; j--) if (shown(ALL[j])) return { type: "q", i: j };
+    return { type: "welcome" };
+  }
+
+  function renderEnd() {
+    var status;
+    if (syncing || lastSync === null) status = el("p", { class: "lead", text: "نرسل إجاباتك وتسجيلاتك…" });
+    else if (lastSync === "ok") status = el("p", { class: "lead sent", text: "✓ وصلتنا إجاباتك وتسجيلاتك كلها." });
+    else status = el("p", { class: "rec-err", style: "text-align:center", text: "لم يصل كل شيء بعد. تأكد من الإنترنت، ثم اضغط «أعد الإرسال». ما بقي محفوظ في هاتفك." });
+    var body = [
+      snouber("snouber", true),
+      el("h1", { text: "انتهيت! شكرًا لك" }),
+      status,
+      el("p", { class: "lead", text: "سنقرأ كل كلمة ونسمع كل تسجيل، ونعود إليك بما نبنيه." })
+    ];
+    if (lastSync === "failed" && !syncing) {
+      body.push(el("button", { class: "btn primary", type: "button", style: "width:100%;margin-top:12px", text: "أعد الإرسال", onclick: sync }));
+      var wa = el("a", { class: "btn wa", href: "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(readable()), target: "_blank", rel: "noopener" });
+      wa.innerHTML = WA_ICON + "<span>أو أرسل إجاباتك المكتوبة عبر واتساب</span>";
+      body.push(wa);
+    }
+    app.appendChild(el("section", { class: "card step" }, body));
+    app.appendChild(el("nav", {}, [
+      el("button", { class: "btn ghost", type: "button", style: "flex:1", text: "رجوع لتعديل إجاباتي", onclick: function () { go({ type: "q", i: lastShown() }); } }),
+      el("button", { class: "btn ghost", type: "button", style: "flex:1", text: "كل الأجزاء", onclick: function () { go({ type: "welcome" }); } })
+    ]));
+  }
+
+  function go(screen) {
+    stopRec();
+    if (screen.type === "end" && !state.finished) { state.finished = true; state.dirty = true; }
+    state.screen = screen;
+    if (screen.type === "q") state.last = screen;
+    save();
+    render();
+    window.scrollTo(0, 0);
+    sync();
+  }
+
+  render();
+  sync();
+})();
+</script>
+</body>
+</html>
