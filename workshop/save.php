@@ -76,9 +76,17 @@ file_put_contents($rateFile, implode("\n", $hits), LOCK_EX);
 $sid = (string) ($_POST['sid'] ?? '');
 if (!preg_match('/^[a-f0-9]{32}$/', $sid)) reply(400, 'sid');
 $dir = "$root/$sid";
-if (!is_dir($dir) && !@mkdir($dir, 0700)) reply(500, 'storage');
-
 $kind = (string) ($_POST['kind'] ?? '');
+
+// Forget everything sent from one phone. Only that phone knows its random id (128 bits); the team uses it to
+// remove test runs, since Hostinger's tools cannot delete a file outside public_html.
+if ($kind === 'forget') {
+    foreach (glob("$dir/*") ?: [] as $file) @unlink($file);
+    if (is_dir($dir)) @rmdir($dir);
+    reply(is_dir($dir) ? 500 : 200, is_dir($dir) ? 'storage' : '');
+}
+
+if (!is_dir($dir) && !@mkdir($dir, 0700)) reply(500, 'storage');
 
 if ($kind === 'answers') {
     $json = (string) ($_POST['answers'] ?? '');
