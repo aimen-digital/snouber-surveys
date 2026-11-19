@@ -1,6 +1,6 @@
 # Snouber surveys
 
-Static survey pages for Snouber (صنوبر), served at https://surveys.omrandz.online/.
+Static survey pages for Snouber (صنوبر), served at https://fast-lightsalmon-swallow-95.hostingersite.com/.
 
 - `workshop/` — the workshop survey: `index.html` (the page) and `save.php` (receives answers, voice notes and photos
   into `survey-answers/` beside `public_html`, never inside it).
